@@ -1,0 +1,68 @@
+# ---------- Secrets / runtime state ----------
+# Anthropic + Sigma credentials live in process memory or in
+# ~/.config/causality/ outside the repo, but be defensive in case anything
+# leaks into the project tree.
+.env
+.env.*
+*.key
+credentials*
+secrets*
+
+# ---------- Local data / runtime state (NOT for public repo) ----------
+# Real Sigma customer data lands here. Never commit.
+backend/.tabular/
+# Old chromadb store from the previous storage layer (now unused).
+backend/.chroma/
+# User edge-override choices (analyst-specific).
+backend/overrides.sqlite3
+backend/overrides.sqlite3-journal
+
+# Stray uploads / temp data
+backend/.uploads/
+backend/uploads/
+*.parquet
+*.sqlite
+*.sqlite3
+
+# ---------- Python ----------
+backend/.venv/
+backend/venv/
+backend/env/
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# ---------- Node / frontend ----------
+node_modules/
+frontend/dist/
+frontend/build/
+frontend/.vite/
+frontend/node_modules/.vite/
+.pnp.*
+
+# ---------- Editor / OS ----------
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+*.iml
+
+# ---------- Claude Code session state (keep launch.json, drop the rest) ----------
+.claude/projects/
+.claude/sessions/
+.claude/session-env/
+.claude/shell-snapshots/
+.claude/telemetry/
+.claude/backups/
+# Keep .claude/launch.json — it's just dev-server port config
+
+# ---------- Misc logs ----------
+*.log
+logs/
