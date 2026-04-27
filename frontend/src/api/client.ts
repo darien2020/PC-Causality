@@ -145,6 +145,30 @@ export async function sigmaDisconnect(): Promise<void> {
   if (!r.ok) throw new Error(`sigma disconnect failed: ${r.status}`);
 }
 
+export interface SigmaConfig {
+  mcp_url: string;
+  connected: boolean;
+}
+
+export async function sigmaConfig(): Promise<SigmaConfig> {
+  const r = await fetch(`${BASE}/sigma/config`);
+  if (!r.ok) throw new Error(`sigma config fetch failed: ${r.status}`);
+  return r.json();
+}
+
+export async function sigmaSetConfig(mcpUrl: string): Promise<SigmaConfig> {
+  const r = await fetch(`${BASE}/sigma/config`, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ mcp_url: mcpUrl }),
+  });
+  if (!r.ok) {
+    const text = await r.text().catch(() => "");
+    throw new Error(`sigma config save failed: ${r.status} ${text}`);
+  }
+  return r.json();
+}
+
 export type SigmaPolicy = "allow_always" | "ask_always";
 
 export interface SigmaTool {

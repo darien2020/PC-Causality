@@ -280,9 +280,13 @@ repo tree, so the [.gitignore](.gitignore) excludes them.
 |---|---|
 | `ANTHROPIC_API_KEY` | Picked up by `secret_store` at backend start; surfaces as the green "env" badge |
 
-The Sigma MCP URL is currently hard-coded to staging
-(`https://api.staging.sigmacomputing.io/mcp/v2`). If you need prod, edit
-`backend/data/sigma_client.py:SIGMA_MCP_URL`.
+The Sigma MCP URL defaults to staging
+(`https://api.staging.sigmacomputing.io/mcp/v2`). To point at a different
+server, open **⚙ Data sources → Sigma → Configure**, edit the **MCP server URL**
+field, and click Save. The new URL persists to
+`~/.config/causality/sigma_config.json` and survives backend restarts.
+Saving a new URL clears the OAuth tokens (they're scoped to the previous
+server), so you'll need to reconnect once.
 
 ---
 

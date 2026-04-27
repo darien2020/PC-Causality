@@ -1,19 +1,35 @@
 import { useEffect, useState } from "react";
-import { sigmaConnect, sigmaDisconnect, sigmaStatus } from "../api/client";
+import {
+  sigmaConfig,
+  sigmaConnect,
+  sigmaDisconnect,
+  sigmaStatus,
+} from "../api/client";
 import { SigmaConfigurator } from "./SigmaConfigurator";
+
+function stripScheme(url: string): string {
+  return url.replace(/^https?:\/\//, "");
+}
 
 export function SigmaSection() {
   const [connected, setConnected] = useState<boolean | null>(null);
+  const [mcpUrl, setMcpUrl] = useState<string>("");
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const [configOpen, setConfigOpen] = useState(false);
 
   async function refresh() {
     try {
-      const s = await sigmaStatus();
-      setConnected(s.connected);
+      const c = await sigmaConfig();
+      setConnected(c.connected);
+      setMcpUrl(c.mcp_url);
     } catch {
-      setConnected(false);
+      try {
+        const s = await sigmaStatus();
+        setConnected(s.connected);
+      } catch {
+        setConnected(false);
+      }
     }
   }
 
@@ -94,9 +110,9 @@ export function SigmaSection() {
               whiteSpace: "nowrap",
               minWidth: 0,
             }}
-            title="api.staging.sigmacomputing.io/mcp/v2"
+            title={mcpUrl}
           >
-            api.staging.sigmacomputing.io/mcp/v2
+            {mcpUrl ? stripScheme(mcpUrl) : "—"}
           </span>
         </div>
         <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
@@ -143,6 +159,12 @@ export function SigmaSection() {
         open={configOpen}
         onClose={() => setConfigOpen(false)}
         connected={connected}
+        onUrlChanged={() => {
+          // URL change wipes the server-side session; force the badge back
+          // to "Not connected" and re-fetch so the inline URL row updates.
+          setConnected(false);
+          refresh();
+        }}
       />
     </div>
   );

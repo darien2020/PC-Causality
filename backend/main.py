@@ -253,6 +253,30 @@ async def sigma_disconnect() -> dict:
     return {"connected": False}
 
 
+@app.get("/sigma/config")
+async def sigma_get_config() -> dict:
+    return {
+        "mcp_url": sigma_client.get_mcp_url(),
+        "connected": await sigma_client.is_connected(),
+    }
+
+
+class SigmaConfigUpdate(BaseModel):
+    mcp_url: str
+
+
+@app.post("/sigma/config")
+async def sigma_set_config(req: SigmaConfigUpdate) -> dict:
+    """Update the MCP URL. Switching servers wipes the OAuth tokens since
+    they're scoped to the previous server — the user will need to reconnect.
+    """
+    try:
+        new_url = await sigma_client.change_mcp_url(req.mcp_url)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    return {"mcp_url": new_url, "connected": False}
+
+
 @app.get("/sigma/tools")
 async def sigma_tools() -> dict:
     if not await sigma_client.is_connected():
