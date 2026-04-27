@@ -16,6 +16,7 @@ through the causal interpretation.
 ---
 
 ## What you can do
+<img width="2879" height="1413" alt="image" src="https://github.com/user-attachments/assets/78295a97-83d7-47e7-a1e9-9f7ff2a25514" />
 
 - **Ingest from Sigma Computing** via OAuth + the Sigma MCP server. Browse
   data models, search by name through the chat agent, pull up to 1,000,000
