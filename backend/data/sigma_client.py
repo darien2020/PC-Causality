@@ -25,8 +25,14 @@ from mcp.client.auth import OAuthClientProvider, TokenStorage
 from mcp.client.streamable_http import streamablehttp_client
 from mcp.shared.auth import OAuthClientInformationFull, OAuthClientMetadata, OAuthToken
 
-SIGMA_MCP_URL = "https://api.staging.sigmacomputing.io/mcp/v2"
+from data import sigma_config
+
 REDIRECT_URI = "http://127.0.0.1:8765/sigma/oauth-callback"
+
+
+def _mcp_url() -> str:
+    """Resolve the current Sigma MCP URL from persisted config (default = staging)."""
+    return sigma_config.get_url()
 TOKEN_PATH = Path.home() / ".config" / "causality" / "sigma_tokens.json"
 
 
@@ -149,9 +155,9 @@ def resolve_callback(code: str, state: str) -> bool:
     return True
 
 
-def _oauth_provider() -> OAuthClientProvider:
+def _oauth_provider(url: str) -> OAuthClientProvider:
     return OAuthClientProvider(
-        server_url=SIGMA_MCP_URL,
+        server_url=url,
         client_metadata=OAuthClientMetadata(
             client_name="Causality (local)",
             redirect_uris=[REDIRECT_URI],
@@ -169,8 +175,9 @@ def _oauth_provider() -> OAuthClientProvider:
 @asynccontextmanager
 async def session():
     """Open an authenticated MCP session. Triggers OAuth on first call."""
-    auth = _oauth_provider()
-    async with streamablehttp_client(SIGMA_MCP_URL, auth=auth) as (read, write, _):
+    url = _mcp_url()
+    auth = _oauth_provider(url)
+    async with streamablehttp_client(url, auth=auth) as (read, write, _):
         async with ClientSession(read, write) as s:
             await s.initialize()
             yield s
@@ -182,6 +189,19 @@ async def is_connected() -> bool:
 
 async def disconnect() -> None:
     _storage.clear()
+
+
+def get_mcp_url() -> str:
+    return _mcp_url()
+
+
+async def change_mcp_url(url: str) -> str:
+    """Switch the MCP server URL. Wipes any stored OAuth tokens + client info,
+    since they're scoped to the previous server. The next call will trigger a
+    fresh OAuth flow."""
+    new_url = sigma_config.set_url(url)
+    _storage.clear()
+    return new_url
 
 
 def _unwrap_tool_result(result: Any) -> Any:
