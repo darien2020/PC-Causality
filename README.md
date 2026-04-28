@@ -123,7 +123,7 @@ through the causal interpretation.
 
 | Tool | Version | Why |
 |---|---|---|
-| Python | 3.11 or newer | FastAPI + `causal-learn` + pyarrow |
+| Python | 3.10 minimum, 3.11+ recommended | FastAPI 0.136 + Starlette 1.0 require ≥ 3.10; `causal-learn` and `pyarrow` ship wheels for 3.11–3.13. macOS's stock `python3` is often 3.9 — install a newer one with `brew install python@3.11`. |
 | Node.js | 20.x or 22.x | Vite, modern React |
 | Anthropic API key | `sk-ant-api03-...` | Causality Agent and per-edge explanations |
 | Sigma Computing account | optional | only if you want to ingest from Sigma |
@@ -140,16 +140,25 @@ You **don't** need Sigma to try the app — it ships with a synthetic
 git clone <your-fork-url> Causality
 cd Causality
 
-# 2. Backend
+# 2. Confirm Python is ≥ 3.10 (FastAPI 0.136 + Starlette 1.0 require it).
+#    On stock macOS `python3` may be 3.9 — use a specific version below.
+python3.11 --version    # or python3.12 / python3.13
+# If the command above fails, install with: brew install python@3.11
+
+# 3. Backend
 cd backend
-python3 -m venv .venv
+python3.11 -m venv .venv     # use the version you confirmed above
 .venv/bin/pip install --upgrade pip
 .venv/bin/pip install -r requirements.txt
 
-# 3. Frontend
+# 4. Frontend
 cd ../frontend
 npm install
 ```
+
+If `pip install` ends with `No matching distribution found for fastapi==0.136.1`,
+your venv was created with Python ≤ 3.9 — recreate it with an explicit
+`python3.11`/`python3.12`/`python3.13` command per step 3.
 
 ### API key
 
@@ -385,6 +394,13 @@ server), so you'll need to reconnect once.
 ---
 
 ## Troubleshooting
+
+**`pip install -r requirements.txt` fails with "No matching
+distribution found for fastapi==0.136.1"** — your Python is older than
+3.10. FastAPI 0.136 (and its starlette 1.0 dependency) require Python
+≥ 3.10. Check with `python3 --version`; if you're on 3.9 or older,
+install Python 3.11+ (e.g. `brew install python@3.11` on macOS) and
+recreate the venv with `python3.11 -m venv .venv`.
 
 **"Anthropic API key not set"** — set the env var or use the badge in
 the header. The badge validates the key against Anthropic before
