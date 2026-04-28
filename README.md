@@ -385,6 +385,13 @@ server), so you'll need to reconnect once.
 
 ## Troubleshooting
 
+**`pip install -r requirements.txt` fails with "No matching
+distribution found for fastapi==0.136.1"** — your Python is older than
+3.10. FastAPI 0.136 (and its starlette 1.0 dependency) require Python
+≥ 3.10. Check with `python3 --version`; if you're on 3.9 or older,
+install Python 3.11+ (e.g. `brew install python@3.11` on macOS) and
+recreate the venv with `python3.11 -m venv .venv`.
+
 **"Anthropic API key not set"** — set the env var or use the badge in
 the header. The badge validates the key against Anthropic before
 turning green.
