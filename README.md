@@ -1,6 +1,6 @@
 # Causality
 
-A local web app for **causal inferencen** on data.
+A local web app for **causal inference** on data.
 Pulls rows from Sigma Computing or a CSV upload, runs the **PC algorithm**
 (`causal-learn`'s constraint-based discovery) over the variables you select,
 renders the resulting DAG with typed edges, and lets a Claude-powered agent
